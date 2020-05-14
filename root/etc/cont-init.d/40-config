@@ -1,0 +1,8 @@
+#!/usr/bin/with-contenv bash
+
+# make folders
+mkdir -p /config /cache /log /cloud /data /local /tv /movies /plexdrive-decrypt /plexdrive-newdecrypt
+
+# permissions
+chown -R abc:abc /config /cache /log /cloud /data /tv /movies /plexdrive-decrypt /plexdrive-newdecrypt
+chmod a+x /usr/bin/plexdrive_setup

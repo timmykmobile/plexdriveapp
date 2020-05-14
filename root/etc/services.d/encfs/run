@@ -1,0 +1,79 @@
+#!/usr/bin/with-contenv bash
+
+#echo "test if enfs is running"
+while [ -z "$(findmnt /cloud | grep fuse)" ]; do
+  echo "Waiting for plexdrive mounted at /cloud. Retrying in 30s ..."
+  sleep 30
+done
+
+    plexdrive_dir="/cloud"
+    plexdrive_media_dir="${plexdrive_dir}/Media"
+    plexdrive_data_dir="${plexdrive_dir}/Data"
+    plexdrive_decrypt_dir="/plexdrive-decrypt"
+    plexdrive_newdecrypt_dir="/plexdrive-newdecrypt"
+    plexdrive_decrypt_tv_dir="${plexdrive_decrypt_dir}/TV Shows"
+    plexdrive_newdecrypt_tv_dir="${plexdrive_newdecrypt_dir}/TV Shows"
+    plexdrive_decrypt_movies_dir="${plexdrive_decrypt_dir}/Movies"
+    plexdrive_newdecrypt_movies_dir="${plexdrive_newdecrypt_dir}/Movies"
+
+#        echo "Lising all the variables in encfs run file"
+# 	 echo "  ${plexdrive_dir}"
+#        echo "  ${plexdrive_data_dir}"
+#        echo "  ${plexdrive_decrypt_dir}"
+#        echo "  ${plexdrive_newdecrypt_dir}"
+#        echo "  ${plexdrive_decrypt_tv_dir}"
+#        echo "  ${plexdrive_newdecrypt_tv_dir}"
+#        echo "  ${plexdrive_decrypt_movies_dir}"
+#        echo "  ${plexdrive_decrypt_movies_dir}"
+
+    # plexdrive decrypt mount
+#    echo "checking to see if ${plexdrive_decrypt_dir} is already mounted..."
+    if [ $(findmnt ${plexdrive_decrypt_dir} | grep fuse.encfs | wc -l) == "0" ]; then
+      echo "${plexdrive_decrypt_dir} is not mounted currently. Beginning mounting process now..."
+      # Mount away!
+      if [ "$ENCFS_REVERSE" -eq "0" ]; then
+        echo "Reverse is set to no, thus standard mount.  Ready to mount now."
+        echo "going to mount  with the following info:"
+        echo "  ENFS6_CONFIG='/config/encfs_decrypt/'$ENCFS_XML_NAME"
+        echo "  --extpass="cat /config/encfs_decrypt/$ENCFS_PASSWORD_NAME""
+        echo "   /$plexdrive_media_dir"
+        echo "   /$plexdrive_decrypt_dir"
+        ENCFS6_CONFIG='/config/encfs_decrypt/'$ENCFS_XML_NAME encfs --extpass="cat /config/encfs_decrypt/$ENCFS_PASSWORD_NAME" -o allow_other /$plexdrive_media_dir /$plexdrive_decrypt_dir
+        if grep -qs '$plexdrive_decrypt_dir ' /proc/mounts; then
+              echo "Successfully mounted at $plexdrive_decrypt_dir"
+        else 
+          echo "failed to mount with command "
+          echo "ENCFS6_CONFIG='/config/encfs_decrypt/'$ENCFS_XML_NAME encfs --extpass="cat /config/encfs_decrypt/$ENCFS_PASSWORD_NAME" -o allow_other /$plexdrive_media_dir /$plexdrive_decrypt_dir"
+        fi
+      else
+        echo "Ready to set mount as reverse..."
+#        encfs -o allow_other $MOUNT_SOURCE $MOUNT_TARGET
+        encfs --extpass="cat /config/encfs_decrypt/$ENCFS_PASSWORD_NAME" --reverse -o allow_other "/$plexdrive_media_dir" "/$plexdrive_decrypt_dir"
+          if grep -qs '/$plexdrive_decrypt_dir ' /proc/mounts; then
+              echo "Successfully mounted at $plexdrive_decrypt_dir"
+          fi
+
+      fi
+    fi
+
+    # plexdrive new decrypt mount
+#    echo "checking to see if ${plexdrive_newdecrypt_dir} is already mounted..."
+    if [ $(findmnt ${plexdrive_newdecrypt_dir} | grep fuse.encfs | wc -l) == "0" ]; then
+      echo "${plexdrive_newdecrypt_dir} is not mounted currently. Beginning mounting process now..."
+      # Mount away!
+      if [ "$ENCFS_REVERSE" -eq "0" ]; then
+        echo "Reverse is set to no, thus standard mount.  Ready to mount now."
+        ENCFS6_CONFIG='/config/encfs_newdecrypt/'$ENCFS_XML_NAME encfs --extpass="cat /config/encfs_newdecrypt/$ENCFS_PASSWORD_NAME" -o allow_other /$plexdrive_data_dir /$plexdrive_newdecrypt_dir
+        if grep -qs '$plexdrive_newdecrypt_dir ' /proc/mounts; then
+          echo "Successfully mounted at $plexdrive_decrypt_dir"
+        fi
+      else
+        echo "Ready to set mount as reverse..."
+  #        encfs -o allow_other $MOUNT_SOURCE $MOUNT_TARGET
+        encfs --extpass="cat /config/encfs_newdecrypt/$ENCFS_PASSWORD_NAME" --reverse -o allow_other "/$plexdrive_data_dir" "/$plexdrive_newdecrypt_dir"
+        if grep -qs '/$plexdrive_newdecrypt_dir ' /proc/mounts; then
+          echo "Successfully mounted at $plexdrive_newdecrypt_dir"
+        fi
+
+      fi
+    fi

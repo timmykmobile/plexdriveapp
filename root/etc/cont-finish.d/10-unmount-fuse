@@ -1,0 +1,15 @@
+#!/usr/bin/with-contenv bash
+
+#kill the nfs server
+service nfs-kernel-server stop
+kill $(pidof rpcbind)
+
+# unmount fuse
+fusermount -uz /tv
+fusermount -uz /movies
+fusermount -uz /plexdrive_decrypt
+fusermount -uz /plexdrive_newdecrypt
+fusermount -uz /data
+fusermount -uz /cloud
+
+

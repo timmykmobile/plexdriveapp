@@ -1,0 +1,33 @@
+#!/usr/bin/with-contenv bash
+
+echo "checking if nfs run is working"
+
+    sleep 5
+
+    while [ -z "$(findmnt /tv | grep fuse.unionfs)" ]; do
+        echo " Waiting for unionfs mount at /tv. Retrying in 30s ..."
+        sleep 30
+    done
+
+    while [ -z "$(findmnt /movies | grep fuse.unionfs)" ]; do
+        echo " Waiting for unionfs mount at /movies. Retrying in 30s ..."
+        sleep 30
+    done
+
+
+	# add the /tv directory to the nfs exports
+#	echo " Adding /tv to the list of /etc/exports"
+#	echo "/tv *(rw,sync,no_subtree_check,fsid=0,no_root_squash)" >> /etc/exports
+
+        # add the /movies directory to the nfs exports
+#	echo " Adding /movies to the list of /etc/exports"
+#        echo "/movies *(rw,sync,no_subtree_check,fsid=1,no_root_squash)" >> /etc/exports
+
+	# update the exportfs
+	if n=1; then
+		rpcbind
+		service nfs-kernel-server start
+
+		#exec exportfs -ra
+		n=1+1
+	fi

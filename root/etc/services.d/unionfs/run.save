@@ -1,0 +1,63 @@
+#!/usr/bin/with-contenv bash
+
+#echo "checking if unionfs run is working"
+if [ "$(printenv POOLING_FS | tr -d '"' | tr -d "'")" == "unionfs" ] && mountpoint -q /local; then
+
+    sleep 5
+
+    # list all of the directories
+    local_tv_dir="/local/TV Shows"
+    local_movies_dir="/local/Movies"
+    plexdrive_decrypt_dir="/plexdrive-decrypt"
+    plexdrive_newdecrypt_dir="/plexdrive-newdecrypt"
+    plexdrive_decrypt_tv_dir="${plexdrive_decrypt_dir}/TV Shows"
+    plexdrive_newdecrypt_tv_dir="${plexdrive_newdecrypt_dir}/TV Shows"
+    plexdrive_decrypt_movies_dir="${plexdrive_decrypt_dir}/Movies"
+    plexdrive_newdecrypt_movies_dir="${plexdrive_newdecrypt_dir}/Movies"
+
+    while [ -z "$(findmnt /cloud | grep fuse)" ]; do
+        echo "Waiting for plexdrive mounted at /cloud. Retrying in 30s ..."
+        sleep 30
+    done
+
+    while [ -z "$(findmnt ${plexdrive_decrypt_dir} | grep fuse)" ]; do
+        echo "Waiting for plexdrive decrypted mounted at ${plexdrive_decrypt_dir}. Retrying in 30s ..."
+        sleep 30
+    done
+
+    while [ -z "$(findmnt ${plexdrive_newdecrypt_dir} | grep fuse)" ]; do
+        echo "Waiting for plexdrive new decrypted folder mounted at ${plexdrive_newdecrypt_dir}. Retrying in 30s ..."
+        sleep 30
+    done
+
+# unionfs tv directory first
+
+    # Mount if not already mounted
+#    echo "checking if tv shows unionfs is mounted"
+    if [ $(findmnt /tv | grep fuse.unionfs | wc -l) == "0" ]; then
+        echo "unionfs of the tv shows is not mounted at /tv.  Beginning mounting now"
+        ufs_basic_opts="-o uid=${PUID:-911},gid=${PGID:-911},umask=022,allow_other"
+        IFS=" " read -r -a ufs_user_opts <<< "$UFS_USER_OPTS"
+        ufs_branches="${local_tv_dir}=RW:${plexdrive_decrypt_tv_dir}=RO:${plexdrive_newdecrypt_tv_dir}=RO"
+          echo "${ufs_branches}"
+
+        mount_command="unionfs ${ufs_basic_opts} -o ${ufs_user_opts} ${ufs_branches} /tv"
+        echo "executing => $mount_command"
+        #exec ${mount_command}
+        #exec "unionfs ${ufs_basic_opts} -o ${ufs_user_opts} ${ufs_branches} /tv"
+        exec unionfs -o uid=1000,gid=1000,umask=022,allow_other -o cow,direct_io,nonempty,auto_cache,sync_read "/local/TV Shows"=RW:"/plexdrive-decrypt/TV Shows"=RO:"/plexdrive-newdecrypt/TV Shows"=RO /tv
+    fi
+
+# unionfs movies directory second
+    if [ $(findmnt /movies | grep fuse.unionfs | wc -l) == "0" ]; then
+        ufs_basic_opts="-o uid=${PUID:-911},gid=${PGID:-911},umask=022,allow_other"
+        IFS=" " read -r -a ufs_user_opts <<< "$UFS_USER_OPTS"
+        ufs_branches="${local_movies_dir}=RW:${plexdrive_decrypt_movies_dir}=RO:${plexdrive_newdecrypt_movies_dir}=RO"
+
+        mount_command="unionfs ${ufs_basic_opts} -o ${ufs_user_opts} ${ufs_branches} /movies"
+        echo "executing => $mount_command"
+        exec $mount_command
+    fi
+
+
+fi
