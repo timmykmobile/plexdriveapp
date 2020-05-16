@@ -3,6 +3,10 @@
 . /etc/default/nfs-kernel-server
 . /etc/default/nfs-common
 
+        # Edit the /etc/default/nfs-kernel-server to fix the rpc mount port
+        sed -i '/RPCMOUNT/d' /etc/default/nfs-kernel-server
+        echo 'RPCMOUNTDOPTS="--port 20048"' >> /etc/default/nfs-kernel-server
+
         # add the /tv directory to the nfs exports
         echo " Adding /tv to the list of /etc/exports"
         echo "/tv *(rw,sync,no_subtree_check,fsid=0,no_root_squash)" >> /etc/exports
