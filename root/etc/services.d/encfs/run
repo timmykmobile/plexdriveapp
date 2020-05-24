@@ -1,7 +1,8 @@
 #!/usr/bin/with-contenv bash
 
 #echo "test if enfs is running"
-while [ -z "$(findmnt /cloud | grep fuse)" ]; do
+#while [ -z "$(findmnt /cloud | grep fuse)" ]; do
+while [ ! -d "/cloud/Media" ]; do
   echo "Waiting for plexdrive mounted at /cloud. Retrying in 30s ..."
   sleep 30
 done
