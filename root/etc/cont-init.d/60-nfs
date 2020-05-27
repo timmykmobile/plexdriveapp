@@ -9,11 +9,11 @@
 
         # add the /tv directory to the nfs exports
         echo " Adding /tv to the list of /etc/exports"
-        echo "/tv *(rw,sync,no_subtree_check,fsid=0,no_root_squash)" >> /etc/exports
+        echo "/tv *(rw,sync,no_subtree_check,fsid=1001,no_root_squash)" >> /etc/exports
 
         # add the /movies directory to the nfs exports
         echo " Adding /movies to the list of /etc/exports"
-        echo "/movies *(rw,sync,no_subtree_check,fsid=1,no_root_squash)" >> /etc/exports
+        echo "/movies *(rw,sync,no_subtree_check,fsid=1002,no_root_squash)" >> /etc/exports
 
 rpcbind
 service nfs-kernel-server start
