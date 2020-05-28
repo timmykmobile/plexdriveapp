@@ -1,8 +1,9 @@
 #!/usr/bin/with-contenv bash
 
-echo "checking if nfs run is working"
+#echo "checking if nfs run is working"
 
     sleep 5
+if $NFS_ENABLE = TRUE; then
 
     while [ -z "$(findmnt /tv | grep fuse.unionfs)" ]; do
         echo " Waiting for unionfs mount at /tv. Retrying in 30s ..."
@@ -32,3 +33,4 @@ echo "checking if nfs run is working"
 		exec exportfs -ra
 		vartest="notnull"
 	fi
+fi
