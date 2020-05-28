@@ -79,6 +79,7 @@ EXPOSE 111/udp 2049/tcp
 COPY root/ /
 
 # environment settings - pooling fs
+ENV NFS_ENABLE "FALSE"
 ENV POOLING_FS "unionfs"
 ENV UFS_USER_OPTS "cow,direct_io,nonempty,auto_cache,sync_read"
 ENV MFS_USER_OPTS "rw,async_read=false,use_ino,allow_other,func.getattr=newest,category.action=all,category.create=ff,cache.files=partial,dropcacheonclose=true"
