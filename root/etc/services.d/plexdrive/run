@@ -10,6 +10,7 @@ done
   fusermount -u /plexdrive-decrypt
   fusermount -u /plexdrive-newdecrypt
   fusermount -u /cloud
+  chown -R abc:abc /config /cache /log /cloud /data /plexdrive-decrypt /plexdrive-newdecrypt /tv /movies
 
 pd_mountpoint=$(if ! mountpoint -q /local; then echo /data; else echo /cloud; fi)
 
