@@ -1,5 +1,16 @@
 #!/usr/bin/with-contenv bash
 
+while [ -d "/cloud/Data" ]; do
+  sleep 15
+done
+
+  echo "plexdrive folder no longer connected.  Need to re-establish connection"
+  exec s6-setuidgid abc fusermount -u /tv
+  exec s6-setuidgid abc fusermount -u /movies
+  exec s6-setuidgid abc fusermount -u /plexdrive-decrypt
+  exec s6-setuidgid abc fusermount -u /plexdrive-newdecrypt
+  exec s6-setuidgid abc fusermount -u /cloud
+
 pd_mountpoint=$(if ! mountpoint -q /local; then echo /data; else echo /cloud; fi)
 
 pd_basic_opts="
