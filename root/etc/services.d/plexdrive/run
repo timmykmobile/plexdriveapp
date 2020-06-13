@@ -5,11 +5,11 @@ while [ -d "/cloud/Data" ]; do
 done
 
   echo "plexdrive folder no longer connected.  Need to re-establish connection"
-  exec s6-setuidgid abc fusermount -u /tv
-  exec s6-setuidgid abc fusermount -u /movies
-  exec s6-setuidgid abc fusermount -u /plexdrive-decrypt
-  exec s6-setuidgid abc fusermount -u /plexdrive-newdecrypt
-  exec s6-setuidgid abc fusermount -u /cloud
+  fusermount -u /tv
+  fusermount -u /movies
+  fusermount -u /plexdrive-decrypt
+  fusermount -u /plexdrive-newdecrypt
+  fusermount -u /cloud
 
 pd_mountpoint=$(if ! mountpoint -q /local; then echo /data; else echo /cloud; fi)
 
