@@ -15,7 +15,7 @@ while [ $(findmnt ${pd_mountpoint} | grep fuse | wc -l) != "0" ]; do
 done
 
 # permissions
-chown -R abc:abc /config /cache /log /cloud /data
+chown -R abc:abc /config /cache /log /cloud /data /plexdrive-decrypt /plexdrive-newdecrypt
 
 # display version
 echo "*** plexdrive $(plexdrive --version) ready!"
